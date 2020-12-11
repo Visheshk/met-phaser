@@ -1,5 +1,7 @@
 import './hello.html';
-import Phaser from 'Phaser';
+import Phaser from 'phaser';
+import { Tracker } from 'meteor/tracker';
+import { Session } from 'meteor/session';
 
 Template.hello.onCreated(function helloOnCreated() {
   // counter starts at 0
@@ -129,12 +131,28 @@ Template.hello.onCreated(function helloOnCreated() {
 	{
 	    star.disableBody(true, true);
 	    upScore(10);
+      score += 1;
+      Session.set("counter", Session.get("counter") + 1);
+      // console.log(Session.get("counter"));
+      scoreText.setText('Score: ' + Session.get("counter") );
 	}
 
-	var upScore = function (inc=1) {
+	function upScore (inc=1) {
 		score += inc;
-	    scoreText.setText('Score: ' + score);
+	  // this.scoreText.setText('Score: ' + score);
 	}
+
+  upScore(Session.get("counter"));
+
+  Tracker.autorun(() => {
+    // ct = Template.instance().counter.get();
+    console.log(Session.get("counter"));
+    // this.upScore(Session.get("counter"));
+    // console.log(ct);
+    // if (ct){
+    //   upScore(ct);
+    // }
+  });
 
 
 });
@@ -147,8 +165,9 @@ Template.hello.helpers({
 
 Template.hello.events({
   'click button'(event, instance) {
-  	this.upScore();
+  	// this.upScore();
     // increment the counter when button is clicked
     instance.counter.set(instance.counter.get() + 1);
+    Session.set("counter", Session.get("counter") + 1);
   },
 });
