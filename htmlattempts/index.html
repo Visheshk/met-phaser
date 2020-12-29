@@ -1,0 +1,106 @@
+
+<html>
+<link rel="stylesheet" type="text/css" href="./style.css">
+<head>
+</head>
+<body id="body">
+	<img src = "/tiles/l2.png" alt = "usemap" usemap = "#lessons" style="position:absolute; left:150px; top:150px"/>
+      <map name = "lessons">
+         <area shape = "poly" coords = "0,32,65,0,130,32,65,83"
+            href = "#" alt = "Perl Tutorial" target = "_blank" />
+      </map>
+	<button onclick="svgclick();"> </button>
+	<svg height="1000" width="1000" id="svgcanv" style="z-index:1000">
+	
+	<polygon points="270,350,335,318,400,350,335,382" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="335,317,400,285,465,317,400,349" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="400,284,465,252,530,284,465,316" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="335,383,400,351,465,383,400,415" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="400,350,465,318,530,350,465,382" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="465,317,530,285,595,317,530,349" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="400,416,465,384,530,416,465,448" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="465,383,530,351,595,383,530,415" style="fill:lime;stroke:purple;stroke-width:1"></polygon><polygon points="530,350,595,318,660,350,595,382" style="fill:lime;stroke:purple;stroke-width:1"></polygon>
+	</svg>
+	<!-- <svg height="1000" width="1000" id="svgcanv">
+	  <polygon points="200,10 250,190 160,210" style="fill:lime;stroke:purple;stroke-width:1" />
+	</svg> -->
+</body>
+<script type="text/javascript">
+	svgclick = function() {
+		console.log("svg clicked");
+	}
+	b = document.getElementById("body");
+	svc = document.getElementById("svgcanv");
+	tileList = [
+		"tiles/l1.png", 
+		"tiles/l2.png", 
+		"tiles/l3.png", 
+		"tiles/l4.png", 
+		"tiles/lmid.png", 
+		"tiles/lup.png", 
+		"tiles/ldown.png"];
+	mapWidth = 3;
+	mapHeight = 3;
+	map = [[0, 4, 1], [2, 5, 6], [2, 4, 3]];
+	tileHeight = 33;
+	tileWidth = 65;
+
+	for (var h=0; h < mapHeight; h++){
+		var rowTop = 300 + h*tileHeight;
+		var rowLeft = 300 + h*tileWidth;
+		for (var w=0; w < mapWidth; w++){
+			var g = new Image();
+			var loc = "x" + w + "y" + h;
+			g.id = "tile-" + loc;
+			g.src = tileList[map[h][w]];
+			// console.log(g["height"]);
+			g.setAttribute("usemap", "#tile-map-" + loc);
+			g.className = "tileImage";
+			// console.log(loc);
+
+			console.log(g.height);
+			var tileTop = rowTop - (w*tileHeight) - g.height;
+			// var tileTop = rowTop - (w*tileHeight) ;
+			var tileLeft = rowLeft + (w*tileWidth);
+			
+			var zind = mapWidth * (h + 1) - w;
+
+			g.style = "position:absolute; top:" + tileTop + "px; left:" + tileLeft + "px; z-index:"  + zind + ";";
+
+			var gm = document.createElement("map");
+			gm.setAttribute("name", "tile-map-" + loc);
+			var gma = document.createElement("area");
+			gma.setAttribute("shape", "poly");
+			gma.setAttribute("href", "#");
+			// gma.setAttribute("target", "_blank");
+			mapht = g.height - 16;
+			if (mapht == -16) { mapht = 114;}
+
+			coordStr = "0," + String(mapht-48) + ",65," + String(mapht - 80) + ",131," + String(mapht-48) + ",65," + String(mapht-16);
+			//mid left corner, top mid point, mid right, bottom mid
+			// if (mapht == -16) { mapht = 114;}
+			
+			// console.log(coordStr);
+			
+			gma.setAttribute("coords", coordStr);
+			gma.setAttribute("href", "#" + loc);
+			gma.className = "mapClick";
+
+			b.appendChild(g);
+			b.appendChild(gm);
+			gm.appendChild(gma);
+			
+			tileLeft2 = tileLeft - 30;
+			tileTop2 = tileTop - 32;
+			coordStr2 = 
+				String(tileLeft2) + "," + String(tileTop2 + mapht - 32) + "," + 
+				String(tileLeft2 + 65) + "," + String(tileTop2 + mapht - 64) + "," + 
+				String(tileLeft2 + 130) + "," + String(tileTop2 + mapht - 32) + "," + 
+				String(tileLeft2 + 65) + "," + String(tileTop2 + mapht);
+			// console.log(loc + " " + coordStr2);
+			polstyle = 'fill:lime;stroke:purple;stroke-width:1';
+			pol = document.createElement("polygon");
+			pol.setAttribute("points", coordStr2);
+			pol.setAttribute("style", polstyle);
+			svc.appendChild(pol);
+
+			// console.log(g.height);
+			
+		}
+	}
+
+</script>
+</html>
