@@ -31,7 +31,7 @@
          "name":"isoblocks",
          "spacing":0,
          "tilecount":168,
-         "tileheight":128,
+         "tileheight":64,
          "tilewidth":111
         }],
  "tilewidth":111,

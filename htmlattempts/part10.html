@@ -2,7 +2,7 @@
 <html lang="en"> 
 <head> 
     <meta charset="UTF-8" />
-    <title>Making your first Phaser 3 Game - Part 10</title>
+    <title>My Phaser Struggles</title>
     <script src="http://cdn.jsdelivr.net/npm/phaser@3.50.1/dist/phaser.js"></script>
     <style type="text/css">
         body {
@@ -14,28 +14,36 @@
 
 <script type="text/javascript">
 
+
 var config = {
-    type: Phaser.AUTO,
-    width: 2500,
-    height: 2500,
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
+  type: Phaser.WEBGL,
+  width: 2300,
+  height: 1500,
+  backgroundColor: '#2d2d2d',
+  parent: 'tile-click',
+  pixelArt: true,
+  scene: {
+      preload: preload,
+      create: create,
+      update: update
+  }
 };
-
-
 var game = new Phaser.Game(config);
+var controls;
+var marker;
+var map;
+var layer;
+var shiftKey;
+var selectedTile;
 
-function preload ()
-{
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.image('base_tiles', 'assets/tilesheet_complete.png');
-    this.load.tilemapTiledJSON('tilemap', 'assets/ugh.json')
+function preload () {
+  // this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+  this.load.image('base_tiles', 'assets/tilesheet_complete.png');
+  this.load.tilemapTiledJSON('tilemap', 'assets/ugh.json');
+  
 }
 
-function tileClick(sprite, tile) {
+function tileClick2(sprite, tile) {
     console.log(tile);
 }
 
@@ -43,21 +51,83 @@ function tileClick(val, ind, arr) {
     console.log(val);
 }
 
-function create ()
-{
-    const map = this.make.tilemap({ key: 'tilemap' })
-    const tileset = map.addTilesetImage('isoblocks', 'base_tiles')
-    map.createLayer('Tile Layer 1', tileset)
-    tileList = [...Array(400).keys()];
-    map.forEachTile(tileClick);    
-    // map.setTileIndexCallback(tileList, tileClick, this);
+function create () {
+  map = this.make.tilemap({ key: 'tilemap' });
+  const tileset = map.addTilesetImage('isoblocks', 'base_tiles', 111, 128, 0);
+  layer = map.createLayer('Tile Layer 1', tileset, 1100, 0);
+
+  marker = this.add.graphics();
+  marker.lineStyle(2, 0x000000, 1);
+  marker.strokeRect(0, 0, map.tileWidth, map.tileHeight);
+
+  this.cameras.main.setBounds(0, 0, 2300, map.heightInPixels);
+  selectedTile = map.getTileAt(2, 3);
+  var cursors = this.input.keyboard.createCursorKeys();
+  var controlConfig = {
+      camera: this.cameras.main,
+      left: cursors.left,
+      right: cursors.right,
+      up: cursors.up,
+      down: cursors.down,
+      speed: 0.5
+  };
+  controls = new Phaser.Cameras.Controls.FixedKeyControl(controlConfig);
+
+  shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+
+  var help = this.add.text(16, 16, 'Left-click to paint.\nShift + Left-click to select tile.\nArrows to scroll.', {
+      fontSize: '18px',
+      padding: { x: 10, y: 5 },
+      backgroundColor: '#000000',
+      fill: '#ffffff'
+  });
+  help.setScrollFactor(0);
+  // map.setTileIndexCallback(tileList, tileClick2, this);
+  // map.forEachTile(tileClick);    
+  
 
 }
+var pressed = false;
+var highlightedTile;
 
-function update ()
-{
+function update (time, delta) {
+  controls.update(delta);
 
+  var worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+
+  // Rounds down to nearest tile
+  var newPointerTile = map.worldToTileXY(worldPoint.x, worldPoint.y, true);
+  marker.x = map.tileToWorldX(newPointerTile.x);
+  marker.y = map.tileToWorldY(newPointerTile.y);
+
+  if (this.input.manager.activePointer.isDown) {
+    if (pressed == false){
+      pressed = true;
+      console.log(newPointerTile);
+      newTile = map.getTileAt(newPointerTile.x, newPointerTile.y);
+      if (newTile != undefined) {
+        if (newPointerTile.x != selectedTile.x || newPointerTile.y != selectedTile.y){
+          // selectedTile.tint.clearTint();
+          selectedTile.tint = 0x22ffffff;
+          selectedTile.y += 2;
+          selectedTile = newTile;
+          selectedTile.tint = 374899438;
+          selectedTile.y -= 2;
+        }
+        else {
+          selectedTile.y += 2;
+          selectedTile.tint = 0x22ffffff;
+        }
+      }
+    }
+  }
+  else if (pressed == true) {
+    pressed = false;
+
+  }
 }
+
+
 
 </script>
 
